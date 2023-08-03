@@ -1,118 +1,225 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import React, { useMemo, useState } from "react"
+import Dropdown from "@/components/Dropdown";
+import MultipleDropdown from "@/components/MultipleDropdown";
+import StarRating from "@/components/StarRating";
+import Alert from "@/components/Alert";
+import Success from "@/components/Success";
+import AutocompleteInput from "@/components/AutocompleteInput";
+import { useLoadScript } from "@react-google-maps/api";
 
-const inter = Inter({ subsets: ['latin'] })
+const mapboxKey = process.env.NEXT_PUBLIC_MAPBOX_KEY
 
 export default function Home() {
+  const [loading, setLoading] = useState<boolean>(false)
+  const [selectedMood, setSelectedMood] = useState<{name:string}>({
+    name: ""
+  })
+  const [selectedCuisine, setSelectedCuisine] = useState([])
+  const [selectedMealtime, setSelectedMealtime] = useState([])
+  const [rating, setRating] = useState<number>(0);
+  const [name, setName] = useState('')
+  const [location,setLocation] = useState('')
+  const [budget, setBudget] = useState<number | ''>('')
+  const [isChain, setIsChain] = useState(false)
+  const [error, setError] = useState('')
+  const [resetChild, setResetChild] = useState(false)
+
+  const [success, setSuccess] = useState(false)
+  console.log(selectedCuisine)
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    //submit for approval
+    setLoading(true)
+    if (!selectedMood || rating === 0 || !name || !budget || selectedCuisine.length === 0 || selectedMealtime.length === 0 ) {
+      setError('All fields must be filled')
+      return
+    }
+
+    let loc = isChain ? 'chain' : location
+
+    let md = selectedMood.name.toLowerCase()
+    let cuisines = selectedCuisine.map((obj:{name:string}) => obj.name.toLowerCase()).join(' ')
+    let mealtimes = selectedMealtime.map((obj:{name:string}) => obj.name.toLowerCase()).join(' ')
+    console.log(typeof budget)
+    let bdgt = budget
+    if (typeof budget != "number") {
+      bdgt = parseInt(budget)
+    }
+
+    const form = {
+      name: name,
+      location: loc,
+      budget: bdgt,
+      mood: md,
+      cuisine: cuisines,
+      mealtime: mealtimes,
+      rating: rating
+    }
+    console.log(form)
+    let dev = process.env.NODE_ENV !== 'production';
+    const url = `${dev ? process.env.NEXT_PUBLIC_DEV_API_URL : process.env.NEXT_PUBLIC_PROD_API_URL}/places`
+
+    const resp = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(form),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    const data = await resp.json()
+
+    if (resp.ok) {
+      setSuccess(true)
+      resetForm()
+      setLoading(false)
+    } else {
+      setError(data.error)
+      setLoading(false)
+      return
+    }
+  }
+
+  const resetForm = () => {
+    setSelectedCuisine([])
+    setSelectedMealtime([])
+    setSelectedMood({name:""})
+    setName('')
+    setLocation('')
+    setRating(0)
+    setBudget('')
+    setIsChain(false)
+    setResetChild(true)
+  }
+
+  const closeError = () => {
+    setError('')
+  }
+
+  const closeSuccess = () => {
+    setSuccess(false)
+  }
+
+  const libraries = useMemo(() => ['places'], []);
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLEMAPS_KEY,
+    libraries: libraries,
+  }); 
+
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
+      className="h-screen bg-gray-400 flex justify-center items-center"
     >
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+      {error && <Alert message={error} close={closeError}/>}
+      {success && <Success close={closeSuccess}/>}
+      <div className="flex flex-col items-center justify-center bg-white md:w-3/5 w-full h-full md:h-fit md:rounded-xl shadow-xl p-5">
+        
+        <form onSubmit={handleSubmit} className="flex flex-col gap-y-4 w-full">
+        <h1 className="text-3xl font-bold text-center">Recommend a food place!</h1>
+        
+        <div className="flex flex-col gap-x-2 relative">
+          <label className="ml-2 mb-1">Name of place<span className="ml-2 text-xs text-gray-500 font-semibold">Note: Singapore only</span></label>
+          {isLoaded && <AutocompleteInput reset={resetChild} setReset={setResetChild} onAddressSelect={(name:string, address:string) => {
+            setName(name)
+            setLocation(address)
+          }}/>}
+          
         </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+        <div className="flex-row flex items-center gap-x-2 -mt-2 ml-2">
+          <input
+            type="checkbox"
+            checked={isChain}
+            onChange={()=>setIsChain(!isChain)}
+            className="scale-125"
+          />
+          <label>
+            Check this if food place is a chain
+          </label>
+        </div>
+        
+        
+        
+        <Dropdown
+          selected={selectedMood}
+          setSelected={setSelectedMood}
+          items={mood}
+          name="mood"
+          label="Mood"
+          placeholder="What do you feel when you want this?"
         />
-      </div>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+        <div className="flex flex-col gap-x-2">
+          <label className="ml-2 mb-1">Estimated spending per pax</label>
+          <input
+            name="budget"
+            type="number"
+            value={budget}
+            onChange={(e)=>setBudget(e.target.value)}
+            placeholder="Cost"
+            className="w-full p-2 rounded-lg appearance-none border-2 border-gray-200 !outline-none"
+          />
+          
+        </div>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+        <MultipleDropdown
+          selected={selectedCuisine}
+          setSelected={setSelectedCuisine}
+          items={cuisine}
+          name="cuisine"
+          label="Cuisine type"
+          placeholder="Select cuisines"
+        />
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
+        <MultipleDropdown
+          selected={selectedMealtime}
+          setSelected={setSelectedMealtime}
+          items={mealtime}
+          name="mealtime"
+          label="Suited mealtimes"
+          placeholder="Select mealtimes"
+        />
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+        <div className="items-center flex w-full justify-center flex-col gap-y-2 mt-2">
+          <label>Rating</label>
+          <StarRating
+            onChange={setRating}
+            value={rating}
+          />
+        </div>
+        
+
+
+        <button 
+          type="submit"
+          className={`w-full text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#FD5B61] hover:shadow-xl'} px-9 py-3 shadow-md rounded-lg
+          font-bold mt-4 mb-2 `}
+        >Submit</button>
+
+        </form>
+        
+        
       </div>
     </main>
   )
 }
+
+const mood = [
+  { id: 1, name: 'Healthy', unavailable: false },
+  { id: 2, name: 'Comfort', unavailable: false },
+  { id: 3, name: 'Energy', unavailable: false },
+  { id: 4, name: 'Indulgent', unavailable: true },
+]
+
+const mealtime = [
+  { id: 1, name: 'Brunch', unavailable: false },
+  { id: 2, name: 'Lunch', unavailable: false },
+  { id: 3, name: 'Dinner', unavailable: false },
+  { id: 4, name: 'Snack', unavailable: true },
+]
+
+const cuisine = [
+  { id: 1, name: 'Chinese', unavailable: false },
+  { id: 2, name: 'Western', unavailable: false },
+  { id: 3, name: 'Japanese', unavailable: false },
+  { id: 4, name: 'Italian', unavailable: true },
+  { id: 5, name: 'Korean', unavailable: false },
+]

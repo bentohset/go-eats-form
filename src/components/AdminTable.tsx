@@ -33,8 +33,7 @@ const AdminTable = ({ items, approved, headers, deleteData, approveItem, editIte
         rating: 0,
     })
 
-    const handleEdit = async (event: { preventDefault: () => void; }) => {
-        event.preventDefault()
+    const handleEdit = async () => {
         let dev = process.env.NODE_ENV !== 'production';
         const url = `${dev ? process.env.NEXT_PUBLIC_DEV_API_URL : process.env.NEXT_PUBLIC_PROD_API_URL}/places/${item.id}`
         console.log(url)
@@ -53,8 +52,7 @@ const AdminTable = ({ items, approved, headers, deleteData, approveItem, editIte
         }
     }
 
-    const handleDelete = async (event: { preventDefault: () => void; }, id: number) => {
-        event.preventDefault()
+    const handleDelete = async (id: number) => {
         let dev = process.env.NODE_ENV !== 'production';
         const url = `${dev ? process.env.NEXT_PUBLIC_DEV_API_URL : process.env.NEXT_PUBLIC_PROD_API_URL}/places/${id}`
         console.log(url)
@@ -72,8 +70,7 @@ const AdminTable = ({ items, approved, headers, deleteData, approveItem, editIte
         }
     }
 
-    const handleApprove = async (event:{ preventDefault: () => void; }, id: number) => {
-        event.preventDefault()
+    const handleApprove = async (id: number) => {
         let dev = process.env.NODE_ENV !== 'production';
         const url = `${dev ? process.env.NEXT_PUBLIC_DEV_API_URL : process.env.NEXT_PUBLIC_PROD_API_URL}/places/${id}/approve`
         console.log(url)
@@ -135,9 +132,9 @@ const AdminTable = ({ items, approved, headers, deleteData, approveItem, editIte
                         ))}
                         <td className="px-6 py-4 gap-x-2 flex flex-row justify-center">
                             <button onClick={()=>{openModal(item)}} className="font-medium text-blue-600  hover:underline">Edit</button>
-                            <button onClick={()=>{handleDelete(event, item.id)}} className="font-medium text-blue-600  hover:underline">Delete</button>
+                            <button onClick={()=>{handleDelete(item.id)}} className="font-medium text-blue-600  hover:underline">Delete</button>
                             {!approved &&
-                            <button onClick={()=>{handleApprove(event, item.id)}} className="font-medium text-blue-600  hover:underline">Approve</button>
+                            <button onClick={()=>{handleApprove(item.id)}} className="font-medium text-blue-600  hover:underline">Approve</button>
                             }
                         </td>
                     </tr>

@@ -1,4 +1,4 @@
-import React, { useState, Fragment, ChangeEvent } from 'react'
+import React, { useState, Fragment, ChangeEvent, MouseEventHandler } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
 interface Item {
@@ -13,7 +13,7 @@ interface Item {
 }
 
 type Props = {
-  handleSubmitEdit: (event: {    preventDefault: () => void;}) => Promise<void>;
+  handleSubmitEdit: MouseEventHandler<HTMLButtonElement>;
   isOpen: boolean;
   closeModal: () => void;
   item: Item;
@@ -50,7 +50,7 @@ const EditModal = (props: Props) => {
               leaveTo="opacity-0"
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl text-left align-middle shadow-xl transition-all">
-                <form onSubmit={props.handleSubmitEdit} className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                   {/* Modal header  */}
                   <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -135,9 +135,9 @@ const EditModal = (props: Props) => {
                   </div>
                   {/*  Modal footer  */}
                   <div className="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                    <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save all</button>
+                    <button onClick={props.handleSubmitEdit} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save all</button>
                   </div>
-                </form>
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

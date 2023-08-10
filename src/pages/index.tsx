@@ -5,7 +5,7 @@ import StarRating from "@/components/StarRating";
 import Alert from "@/components/Alert";
 import Success from "@/components/Success";
 import AutocompleteInput from "@/components/AutocompleteInput";
-import { useLoadScript } from "@react-google-maps/api";
+import { useLoadScript, Libraries } from "@react-google-maps/api";
 
 const mapboxKey = process.env.NEXT_PUBLIC_MAPBOX_KEY
 
@@ -104,9 +104,11 @@ export default function Home() {
     setBudget(value)
   }
 
-  const GOOGLEMAPSAPIKEY = process.env.NEXT_PUBLIC_GOOGLEMAPS_KEY || ''
+
+  const libraries = useMemo(() => ['places'], []);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: GOOGLEMAPSAPIKEY
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLEMAPS_KEY as string,
+    libraries: libraries as Libraries,
   }); 
 
   return (
@@ -170,7 +172,7 @@ export default function Home() {
           items={cuisine}
           name="cuisine"
           label="Cuisine type"
-          placeholder="Select cuisines"
+          placeholder="Select all cuisines that fit"
         />
 
         <MultipleDropdown
@@ -179,7 +181,7 @@ export default function Home() {
           items={mealtime}
           name="mealtime"
           label="Suited mealtimes"
-          placeholder="Select mealtimes"
+          placeholder="Select all mealtimes that fit"
         />
 
         <div className="items-center flex w-full justify-center flex-col gap-y-2 mt-2">
@@ -209,8 +211,8 @@ export default function Home() {
 const mood = [
   { id: 1, name: 'Healthy', unavailable: false },
   { id: 2, name: 'Comfort', unavailable: false },
-  { id: 3, name: 'Energy', unavailable: false },
-  { id: 4, name: 'Indulgent', unavailable: true },
+  { id: 3, name: 'Casual', unavailable: false },
+  { id: 4, name: 'Indulgent', unavailable: false },
 ]
 
 const mealtime = [
@@ -222,8 +224,26 @@ const mealtime = [
 
 const cuisine = [
   { id: 1, name: 'Chinese', unavailable: false },
-  { id: 2, name: 'Western', unavailable: false },
+  { id: 2, name: 'Thai', unavailable: false },
   { id: 3, name: 'Japanese', unavailable: false },
-  { id: 4, name: 'Italian', unavailable: true },
-  { id: 5, name: 'Korean', unavailable: false },
+  { id: 4, name: 'Korean', unavailable: false },
+  { id: 5, name: 'Taiwanese', unavailable: false },
+  { id: 6, name: 'Asian', unavailable: false },
+  { id: 7, name: 'Malay', unavailable: false },
+  { id: 8, name: 'Indian', unavailable: false },
+  { id: 9, name: 'Fast food', unavailable: false },
+  { id: 10, name: 'Mexican', unavailable: false },
+  { id: 11, name: 'Western', unavailable: false },
+  { id: 12, name: 'Italian', unavailable: false },
+  { id: 13, name: 'Mediterranean', unavailable: false },
+  { id: 14, name: 'Vegetarian', unavailable: false },
+  { id: 15, name: 'Steak', unavailable: false },
+  { id: 16, name: 'Burger', unavailable: false },
+  { id: 17, name: 'Chicken', unavailable: false },
+  { id: 18, name: 'BBQ', unavailable: false },
+  { id: 19, name: 'Pastry', unavailable: false },
+  { id: 20, name: 'Cafe', unavailable: false },
+  { id: 21, name: 'Dessert', unavailable: false },
+  { id: 22, name: 'Swedish', unavailable: false },
+  { id: 23, name: 'Greek', unavailable: false },
 ]

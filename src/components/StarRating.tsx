@@ -3,7 +3,7 @@ import Rating from '@mui/material/Rating';
 
 type Props = {}
 
-const StarRating = ({ onChange, value}:{onChange: Dispatch<SetStateAction<number>>, value:number}) => {
+const StarRating = ({ onChange, value}:{onChange: (value:number|null)=>void, value:number|null}) => {
 
   return (
     <Rating

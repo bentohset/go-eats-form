@@ -6,7 +6,7 @@ import usePlacesAutocomplete, {
 
 
 
-const AutocompleteInput = ({ onAddressSelect, reset, setReset }) => {
+const AutocompleteInput = ({ onAddressSelect, reset, setReset }: {onAddressSelect: (name:string, address:string)=>void, reset: boolean, setReset: (value:boolean)=>void}) => {
     const [country, setCountry] = useState('SG');
     const [type, setTypes] = useState('food');
     const {

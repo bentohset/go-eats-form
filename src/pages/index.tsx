@@ -14,9 +14,9 @@ export default function Home() {
   const [selectedMood, setSelectedMood] = useState<{name:string}>({
     name: ""
   })
-  const [selectedCuisine, setSelectedCuisine] = useState([])
-  const [selectedMealtime, setSelectedMealtime] = useState([])
-  const [rating, setRating] = useState<number>(0);
+  const [selectedCuisine, setSelectedCuisine] = useState<{name:string}[] | []>([])
+  const [selectedMealtime, setSelectedMealtime] = useState<{name:string}[] | []>([])
+  const [rating, setRating] = useState<number | null>(0);
   const [name, setName] = useState('')
   const [location,setLocation] = useState('')
   const [budget, setBudget] = useState<number | ''>('')
@@ -25,7 +25,7 @@ export default function Home() {
   const [resetChild, setResetChild] = useState(false)
 
   const [success, setSuccess] = useState(false)
-  console.log(selectedCuisine)
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     //submit for approval
@@ -99,10 +99,14 @@ export default function Home() {
     setSuccess(false)
   }
 
-  const libraries = useMemo(() => ['places'], []);
+  const handleChange = (e:React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const { value } = e.target as unknown as { value: number}
+    setBudget(value)
+  }
+
+  const GOOGLEMAPSAPIKEY = process.env.NEXT_PUBLIC_GOOGLEMAPS_KEY || ''
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLEMAPS_KEY,
-    libraries: libraries,
+    googleMapsApiKey: GOOGLEMAPSAPIKEY
   }); 
 
   return (
@@ -153,7 +157,7 @@ export default function Home() {
             name="budget"
             type="number"
             value={budget}
-            onChange={(e)=>setBudget(e.target.value)}
+            onChange={handleChange}
             placeholder="Cost"
             className="w-full p-2 rounded-lg appearance-none border-2 border-gray-200 !outline-none"
           />

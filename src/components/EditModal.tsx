@@ -13,7 +13,7 @@ interface Item {
 }
 
 type Props = {
-  handleSubmitEdit: () => void;
+  handleSubmitEdit: (event: {    preventDefault: () => void;}) => Promise<void>;
   isOpen: boolean;
   closeModal: () => void;
   item: Item;

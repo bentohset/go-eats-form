@@ -1,7 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import React, { SetStateAction, useEffect, useState } from 'react'
 import { Tab } from "@headlessui/react";
 import AdminTable from '@/components/AdminTable'
 import EditModal from '@/components/EditModal';
+
+interface Item {
+  id: number;
+  name: string;
+  budget: number;
+  location: string;
+  mood: string;
+  cuisine: string;
+  mealtime: string;
+  rating: number;
+}
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -10,8 +21,8 @@ function classNames(...classes: string[]) {
 const admin = () => {
   const tabs = ["Pending", "Approved"];
   const headers = ["id", "name", "budget", "location", "mood", "cuisine", "mealtime", "rating"]
-  const [approved, setApproved] = useState([])
-  const [requested, setRequested] = useState([])
+  const [approved, setApproved] = useState<Item[]>([])
+  const [requested, setRequested] = useState<Item[]>([])
 
   useEffect(()=>{
     const fetchDataApproved = async () => {
@@ -52,30 +63,30 @@ const admin = () => {
   },[])
 
   
-  const deleteApproved = (id) => {
-    const updated = approved.filter((obj) => obj.id !== id)
+  const deleteApproved = (id:number) => {
+    const updated = approved.filter((obj:Item) => obj.id !== id)
     setApproved(updated)
   }
 
-  const deleteRequested = (id) => {
-    const updated = requested.filter((obj) => obj.id !== id)
+  const deleteRequested = (id:number) => {
+    const updated = requested.filter((obj:Item) => obj.id !== id)
     setRequested(updated)
   }
 
-  const approveId = (id) => {
-    const obj = requested.find((obj) => obj.id === id)
+  const approveId = (id:number) => {
+    const obj = requested.find((obj:Item) => obj.id === id)
 
     if (obj) {
-      const updated = requested.filter((obj) => obj.id !== id)
+      const updated = requested.filter((obj:Item) => obj.id !== id)
       setRequested(updated)
 
       setApproved(approved.concat(obj))
     }
   }
   
-  const editApproved = (id, item) => {
-    setApproved(prev => {
-      return prev.map(obj => {
+  const editApproved = (id:number, item:Item) => {
+    setApproved((prev:Item[]) => {
+      return prev.map((obj:Item) => {
         if (obj.id === id) {
           return { ...obj, ...item};
         }
@@ -84,7 +95,7 @@ const admin = () => {
     })
   }
 
-  const editRequested = (id, item) => {
+  const editRequested = (id:number, item:Item) => {
     setRequested(prev => {
       return prev.map(obj => {
         if (obj.id === id) {
@@ -107,15 +118,15 @@ const admin = () => {
           <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1 w-1/2 mb-4">
             {tabs.map((tab) => (
               <Tab key={tab}
-              className={({ selected }) =>
-              classNames(
-                'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
-                selected
-                  ? 'bg-white shadow'
-                  : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
-              )
-            }
+                className={({ selected }) =>
+                classNames(
+                  'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                  'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
+                  selected
+                    ? 'bg-white shadow'
+                    : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
+                )
+              }
               >{tab}</Tab>
             ))}
           </Tab.List>

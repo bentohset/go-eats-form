@@ -11,13 +11,14 @@ interface Item {
     cuisine: string;
     mealtime: string;
     rating: number;
+    [key: string]: any;
 }
 
 interface Props {
     items: Item[]
 }
 
-const AdminTable = ({ items, approved, headers, deleteData, approveItem, editItem }:{items:Item[], approved:boolean, headers:string[]}) => {
+const AdminTable = ({ items, approved, headers, deleteData, approveItem, editItem }:{items:Item[], approved:boolean, headers:string[], deleteData: (id:number)=>void, approveItem:(id:number)=>void, editItem:(id:number, item: Item)=>void}) => {
     //edit button pops up modal to edit
     const router = useRouter()
     const [showModal, setShowModal] = useState(false)
@@ -32,7 +33,7 @@ const AdminTable = ({ items, approved, headers, deleteData, approveItem, editIte
         rating: 0,
     })
 
-    const handleEdit = async (event) => {
+    const handleEdit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault()
         let dev = process.env.NODE_ENV !== 'production';
         const url = `${dev ? process.env.NEXT_PUBLIC_DEV_API_URL : process.env.NEXT_PUBLIC_PROD_API_URL}/places/${item.id}`
@@ -52,7 +53,7 @@ const AdminTable = ({ items, approved, headers, deleteData, approveItem, editIte
         }
     }
 
-    const handleDelete = async (event, id) => {
+    const handleDelete = async (event: { preventDefault: () => void; }, id: number) => {
         event.preventDefault()
         let dev = process.env.NODE_ENV !== 'production';
         const url = `${dev ? process.env.NEXT_PUBLIC_DEV_API_URL : process.env.NEXT_PUBLIC_PROD_API_URL}/places/${id}`
@@ -71,7 +72,7 @@ const AdminTable = ({ items, approved, headers, deleteData, approveItem, editIte
         }
     }
 
-    const handleApprove = async (event, id) => {
+    const handleApprove = async (event:{ preventDefault: () => void; }, id: number) => {
         event.preventDefault()
         let dev = process.env.NODE_ENV !== 'production';
         const url = `${dev ? process.env.NEXT_PUBLIC_DEV_API_URL : process.env.NEXT_PUBLIC_PROD_API_URL}/places/${id}/approve`
@@ -90,7 +91,7 @@ const AdminTable = ({ items, approved, headers, deleteData, approveItem, editIte
         }
     }
 
-    const openModal = (item) => {
+    const openModal = (item:Item) => {
       setItem(item)
       setShowModal(true)
       console.log("open")

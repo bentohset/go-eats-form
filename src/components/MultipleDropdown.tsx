@@ -1,8 +1,9 @@
 import React, { Dispatch, Fragment, SetStateAction } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { stringify } from 'querystring';
 
-const MultipleDropdown = ({ selected, setSelected, items, name, label, placeholder}: {selected:{name:string}[], setSelected:Dispatch<SetStateAction<never[]>>, items: { id: number; name: string; unavailable: boolean; }[], name: string, label: string, placeholder:string}) => {
+const MultipleDropdown = ({ selected, setSelected, items, name, label, placeholder}: {selected:{name:string}[], setSelected:(value:{name:string}[])=>void, items: { id: number; name: string; unavailable: boolean; }[], name: string, label: string, placeholder:string}) => {
   return (
     <div className="">
       <Listbox value={selected} onChange={setSelected} name={name} multiple>

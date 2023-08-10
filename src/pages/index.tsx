@@ -55,7 +55,7 @@ export default function Home() {
       mealtime: mealtimes,
       rating: rating
     }
-    console.log(form)
+    
     let dev = process.env.NODE_ENV !== 'production';
     const url = `${dev ? process.env.NEXT_PUBLIC_DEV_API_URL : process.env.NEXT_PUBLIC_PROD_API_URL}/places`
 

@@ -1,6 +1,8 @@
 # Go Eats Form
 This repo houses the frontend form and admin dashboard for Go Eats. The main repo can be found [here](https://github.com/bentohset/go-eats).
 
+>Note: Due to TLS and self-signed certification of the web server, requests result in an error. To fix this, visit https://go-eats.816b0060473d4e7c99bf.southeastasia.aksapp.io/ and approve of the security risk. Pending fixing from devs.
+
 ## Usage
 The form consists of 2 key pages:
 
